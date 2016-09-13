@@ -36,17 +36,17 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         KC_EQL,         KC_1,         KC_2,   KC_3,   KC_4,   KC_5,   KC_DELT,
         KC_TAB,        KC_Q,         KC_W,   KC_E,   KC_R,   KC_T,   TG(SYMB),
         CTL_T(KC_ESC),        KC_A,         KC_S,   KC_D,   KC_F,   KC_G,
-        KC_LSFT,        CTL_T(KC_Z),  KC_X,   KC_C,   KC_V,   KC_B,   KC_LGUI,
-        LT(SYMB,KC_GRV),KC_QUOT,      LALT(KC_LSFT),  KC_LEFT,KC_RGHT,
-                                              ALT_T(KC_APP),  KC_LGUI,
+        KC_LSFT,        CTL_T(KC_Z),  KC_X,   KC_C,   KC_V,   KC_B,   KC_DELT,
+        LT(SYMB,KC_GRV),KC_QUOT,      LALT(KC_LSFT),  KC_UP,KC_DOWN,
+                                              KC_LGUI,  KC_LGUI,
                                                               KC_HOME,
                                                KC_SPC,KC_LGUI,KC_END,
         // right hand
              KC_BSPC,     KC_6,   KC_7,   KC_8,   KC_9,   KC_0,             KC_MINS,
              TG(SYMB),    KC_Y,   KC_U,   KC_I,   KC_O,   KC_P,             KC_BSLS,
                           KC_H,   KC_J,   KC_K,   KC_L,   LT(MDIA, KC_SCLN),GUI_T(KC_QUOT),
-             KC_LGUI     ,KC_N,   KC_M,   KC_COMM,KC_DOT, CTL_T(KC_SLSH),   KC_RSFT,
-                                  KC_UP,  KC_DOWN,KC_LBRC,KC_RBRC,          KC_FN1,
+             KC_BSPC     ,KC_N,   KC_M,   KC_COMM,KC_DOT, CTL_T(KC_SLSH),   KC_RSFT,
+                                  KC_LEFT,  KC_RGHT,KC_LBRC,KC_RBRC,          LT(SYMB,KC_GRV),
              KC_LALT,        CTL_T(KC_ESC),
              KC_PGUP,
              KC_PGDN,KC_LGUI, KC_ENT
@@ -77,8 +77,8 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
        // left hand
        M(0),   KC_F1,  KC_F2,  KC_F3,  KC_F4,  KC_F5,  KC_TRNS,
        KC_TRNS,KC_EXLM,KC_AT,  KC_LCBR,KC_RCBR,KC_PIPE,KC_TRNS,
-       KC_TRNS,KC_HASH,KC_DLR, KC_LPRN,KC_RPRN,KC_GRV,
-       KC_TRNS,KC_PERC,KC_CIRC,KC_LBRC,KC_RBRC,KC_TILD,KC_TRNS,
+       KC_TRNS,KC_HASH,KC_DLR, KC_LBRC,KC_RBRC,KC_GRV,
+       KC_TRNS,KC_PERC,KC_CIRC,KC_LPRN,KC_RPRN,KC_TILD,KC_TRNS,
        KC_TRNS,KC_TRNS,KC_TRNS,KC_TRNS,KC_TRNS,
                                        KC_TRNS,KC_TRNS,
                                                KC_TRNS,
@@ -156,8 +156,9 @@ const macro_t *action_get_macro(keyrecord_t *record, uint8_t id, uint8_t opt)
 // Runs just one time when the keyboard initializes.
 void matrix_init_user(void) {
 };
-
 uint16_t cnt = 0;
+uint16_t cntCompare = 10;
+
 uint8_t led = 2;
 
 // Runs constantly in the background, in a loop.
@@ -172,7 +173,11 @@ void matrix_scan_user(void) {
     ergodox_right_led_2_off();
     ergodox_right_led_3_off();
     
-      if (cnt > 500) {
+      if (cnt > cntCompare) {
+        if (cntCompare < 500) {
+          cntCompare += cntCompare / 10;
+          if (cntCompare > 500) { cntCompare = 500; } 
+        }
         cnt = 0;
         led++;
         if (led == 3) { led = 0; }
