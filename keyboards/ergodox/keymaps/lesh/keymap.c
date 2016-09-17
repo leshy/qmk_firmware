@@ -47,8 +47,8 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
              KC_BSPC,     KC_6,   KC_7,   KC_8,   KC_9,   KC_0,             KC_MINS,
              TG(SYMB),    KC_Y,   KC_U,   KC_I,   KC_O,   KC_P,             KC_BSLS,
                           KC_H,   KC_J,   KC_K,   KC_L,   LT(MDIA, KC_SCLN),GUI_T(KC_QUOT),
-             KC_BSPC     ,KC_N,   KC_M,   KC_COMM,KC_DOT, LT(MDIA, KC_SLSH),   KC_RSFT,
-                                  KC_LEFT,  KC_RGHT,KC_LBRC,KC_RBRC,          LT(SYMB,KC_GRV),
+             KC_BSPC     ,KC_N,   KC_M,   KC_COMM,KC_DOT, LT(MDIA, KC_SLSH),KC_RSFT,
+                                  KC_LEFT,  KC_RGHT,KC_LBRC,KC_RBRC,        LT(SYMB,KC_GRV),
              KC_LALT,        CTL_T(KC_ESC),
              KC_HOME,
         LT(SYMB,KC_END),KC_LGUI, KC_ENT
@@ -207,13 +207,13 @@ const macro_t *action_get_macro(keyrecord_t *record, uint8_t id, uint8_t opt)
         
         case 2:
         if (record->event.pressed) {
-          return MACRO(T(LCBR), T(RCBR), T(LEFT) ,END);
+          return MACRO(T(LCBR), T(SPC), T(SPC), T(RCBR), T(LEFT), T(LEFT) ,END);
         }
         break;
         
         case 3:
         if (record->event.pressed) {
-          return MACRODOWN(D(LSHIFT), T(LBRC), T(RBRC), U(LSHIFT), T(LEFT) ,END);
+          return MACRODOWN(D(LSHIFT), T(LBRC), T(SPC), T(SPC), T(RBRC), U(LSHIFT), T(LEFT), T(LEFT) ,END);
         }
         break;
         
@@ -246,56 +246,34 @@ uint8_t led = 2;
 // Runs constantly in the background, in a loop.
 void matrix_scan_user(void) {
   cnt++;
+  
   uint8_t layer = biton32(layer_state);
-
-    ergodox_board_led_off();
-    ergodox_right_led_1_off();
-    ergodox_right_led_2_off();
-    ergodox_right_led_3_off();
+  
+  bool ledState[ 3 ] = { false, false, false};
+  
+  ergodox_board_led_off();
+  ergodox_right_led_1_off();
+  ergodox_right_led_2_off();
+  ergodox_right_led_3_off();
     
-      if (cnt > cntCompare) {
-        if (cntCompare < 500) {
-          cntCompare += cntCompare / 10;
-          if (cntCompare > 500) { cntCompare = 500; } 
-        }
-        cnt = 0;
-        led++;
-        if (led == 3) { led = 0; }
-      }
-
-      if (cnt < 1) {
-        switch (led) {
-        case 0:
-          ergodox_right_led_1_on();
-          break;
-        case 1:
-          ergodox_right_led_2_on();
-          break;
-        case 2:
-          ergodox_right_led_3_on();
-          break;
-        default:
-          ergodox_right_led_1_on();
-          ergodox_right_led_2_on();
-          ergodox_right_led_3_on();
-          break;
-        }
+  if (cnt > cntCompare) {
+    if (cntCompare < 500) {
+      cntCompare += cntCompare / 10;
+      if (cntCompare > 500) { cntCompare = 500; } 
     }
+    cnt = 0;
+    led++;
+    if (led == 3) { led = 0; }
+  }
+  
+  if (cnt < 40) { ledState[ led ] = true; }
+
+  ledState[layer - 1] = !ldState[layer - 1];
+  
+  if (ledState[ 0 ]) { ergodox_right_led_1_on(); }
+  if (ledState[ 1 ]) { ergodox_right_led_2_on(); }
+  if (ledState[ 2 ]) { ergodox_right_led_3_on(); }
+  
     
-    switch (layer) {
-      // TODO: Make this relevant to the ErgoDox EZ.
-        case 1:
-            ergodox_right_led_1_on();
-            break;
-        case 2:
-            ergodox_right_led_2_on();
-            break;
-        case 3:
-            ergodox_right_led_3_on();
-            break;
-        default:
-          //            ergodox_right_led_3_on();
-            break;
-    }
-
+  
 };
